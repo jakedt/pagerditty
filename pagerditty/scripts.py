@@ -83,7 +83,7 @@ def print_report(activity_intervals, time_zone):
     row_writer = csv.writer(sys.stdout)
 
     report_names = [act.name for act in activity_intervals]
-    row_writer.writerow(['Date', *report_names])
+    row_writer.writerow(['Date'] + report_names)
     for date, hours_dict in pay_times.items():
         hours = [hours_dict[report_name] for report_name in report_names]
-        row_writer.writerow([date, *hours])
+        row_writer.writerow([date] + hours)
