@@ -37,14 +37,14 @@ if __name__ == '__main__':
         help='PagerDuty schedule ID(s), e.g. DEFGHIJ',
     )
     parser.add_argument(
-        '--slack_username',
-        help='Slack username to use when determining incident engagement',
-    )
-    parser.add_argument(
         '--start',
         required=True,
         help='Start of the report period',
     )    
+    parser.add_argument(
+        '--slack_username',
+        help='Slack username to use when determining incident engagement',
+    )
     parser.add_argument(
         '--durationunits',
         default='months',
@@ -87,6 +87,12 @@ if __name__ == '__main__':
         type=int,
         help='Duration of a working shift, in hours',
     )
+    parser.add_argument(
+        '--load_incidents',
+        default=False,
+        action='store_true',
+        help='Whether to load and parse incident intervals',
+    )
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG)
@@ -111,6 +117,7 @@ if __name__ == '__main__':
         since,
         until,
         engineer_profile,
+        args.load_incidents,
     )
 
     scripts.print_report(activity_intervals, engineer_profile.time_zone)

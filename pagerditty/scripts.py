@@ -29,7 +29,7 @@ Engineer = namedtuple('Engineer', [
 ])
 
 
-def generate_activity_intervals(since, until, engineer):
+def generate_activity_intervals(since, until, engineer, load_incidents):
     all_oncall = report.load_oncall(
         since,
         until,
@@ -54,18 +54,20 @@ def generate_activity_intervals(since, until, engineer):
     waiting_times = all_oncall.difference(work_schedule)
     logger.debug('Oncall waiting times: %s', waiting_times)
 
-    participation_matchers = [
-        report.LogParticipationMatcher('id', engineer.pagerduty_id),
-    ]
-    if engineer.slack_username is not None:
-        participation_matchers.append(
-            report.LogParticipationMatcher('name', engineer.slack_username)
+    incident_intervals = I.empty()
+    if load_incidents:
+        participation_matchers = [
+            report.LogParticipationMatcher('id', engineer.pagerduty_id),
+        ]
+        if engineer.slack_username is not None:
+            participation_matchers.append(
+                report.LogParticipationMatcher('name', engineer.slack_username)
+            )
+        incident_intervals = report.load_user_incident_intervals(
+            all_oncall,
+            participation_matchers,
         )
-    incident_intervals = report.load_user_incident_intervals(
-        all_oncall,
-        participation_matchers,
-    )
-    logger.debug('Incident intervals: %s', incident_intervals)
+        logger.debug('Incident intervals: %s', incident_intervals)
 
     waiting_pay = waiting_times.difference(incident_intervals)
     incident_pay = incident_intervals.difference(work_schedule)
